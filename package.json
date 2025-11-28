@@ -1,0 +1,15 @@
+{
+  "name": "top-first-call-drivers",
+  "version": "1.0.0",
+  "description": "Call Drivers Service Management System",
+  "main": "server/server.js",
+  "scripts": {
+    "server": "cd server && node server.js",
+    "client": "cd client && npm start",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "install-all": "npm install && cd client && npm install && cd ../server && npm install"
+  },
+  "keywords": ["call-drivers", "chennai", "booking"],
+  "author": "Top First Call Drivers",
+  "license": "MIT"
+}

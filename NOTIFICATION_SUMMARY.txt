@@ -1,0 +1,58 @@
+NOTIFICATION SYSTEM - WHO GETS WHAT
+
+CURRENT IMPLEMENTATION (index.html - Client-Side Only)
+======================================================
+
+WHO SEES NOTIFICATIONS:
+- Only the person viewing the page in their browser
+- Notifications are LOCAL to each user's browser
+- No cross-user notifications yet
+
+EXAMPLES:
+---------
+
+1. DRIVER REGISTERS:
+   ✅ Driver sees: "Registration Submitted"
+   ❌ Admin does NOT see anything
+   
+2. ADMIN APPROVES DRIVER:
+   ✅ Admin sees: "Driver Approved"
+   ❌ Driver does NOT see anything
+   
+3. CUSTOMER BOOKS RIDE:
+   ✅ Customer sees: "Booking Created"
+   ❌ Admin does NOT see anything
+   ❌ Driver does NOT see anything
+
+WHAT'S WORKING:
+---------------
+✅ Browser notifications (for own actions)
+✅ Toast messages
+✅ Notification center
+✅ Sound alerts
+✅ Persistent storage (localStorage)
+
+WHAT'S NOT WORKING:
+-------------------
+❌ Cross-user notifications
+❌ Real-time updates
+❌ Email notifications
+❌ SMS notifications
+❌ WhatsApp notifications
+
+TO GET FULL NOTIFICATIONS:
+--------------------------
+Need to:
+1. Connect to backend API (already created!)
+2. Add email service (SendGrid/Twilio)
+3. Add WebSocket for real-time
+4. Add SMS service (Twilio)
+
+QUICK ANSWER:
+-------------
+Right now, notifications only show to the person taking the action.
+Other users don't see anything automatically.
+
+For full cross-user notifications, need backend integration.
+
+See WHO_GETS_NOTIFICATIONS.md for complete details.
