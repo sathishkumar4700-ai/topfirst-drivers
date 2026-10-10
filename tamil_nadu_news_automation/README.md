@@ -9,6 +9,8 @@ Production-oriented Python automation that discovers Tamil Nadu news, ranks and 
 
 Full guide: [docs/PHASES.md](docs/PHASES.md). Production template: `.env.phase4.example`.
 
+**New to this?** Follow [docs/BEGINNER_SETUP.md](docs/BEGINNER_SETUP.md) (plain language, step by step).
+
 ## Quick start (Phase 1 pilot)
 
 ```bash
