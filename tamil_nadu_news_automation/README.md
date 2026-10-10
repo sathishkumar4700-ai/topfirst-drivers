@@ -47,6 +47,10 @@ See [ARCHITECTURE.md](ARCHITECTURE.md).
 - **Environment**: `.env` (copy from `.env.example`)
 - **Schedule & feeds**: `config/settings.yaml` (Asia/Kolkata cron times, RSS feeds, scoring weights)
 
+## YouTube channel (toptrend71@gmail.com)
+
+Automatic public uploads: copy `.env.toptrend71.example` → `.env`, complete OAuth as **toptrend71@gmail.com**, then `python -m app.cli youtube-whoami`. See [docs/YOUTUBE.md](docs/YOUTUBE.md).
+
 ## YouTube OAuth 2.0
 
 1. Create a Google Cloud project → enable **YouTube Data API v3**.

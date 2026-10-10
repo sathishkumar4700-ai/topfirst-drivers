@@ -20,6 +20,7 @@ def main() -> None:
     run_p.add_argument("--stage", default="full", choices=["full", "collect"])
     sub.add_parser("serve", help="Start API server with scheduler")
     sub.add_parser("youtube-auth", help="Authorize YouTube OAuth (requires client secrets)")
+    sub.add_parser("youtube-whoami", help="Show OAuth email and YouTube channel (verifies expected account)")
 
     args = parser.parse_args()
     if args.command == "init-db":
@@ -42,11 +43,23 @@ def main() -> None:
         from app.services.youtube import YouTubeUploadService
 
         svc = YouTubeUploadService()
-        creds = svc._get_credentials()
-        if creds:
+        try:
+            identity = svc.connected_channel()
             print("YouTube authorization successful.")
-        else:
-            print("Authorization failed — check client secrets path.")
+            print(f"  Email:   {identity['email']}")
+            print(f"  Channel: {identity['channel_title']}")
+            print(f"  URL:     {identity['channel_url']}")
+        except Exception as exc:
+            print(f"Authorization issue: {exc}")
+    elif args.command == "youtube-whoami":
+        from app.services.youtube import YouTubeUploadService
+
+        svc = YouTubeUploadService()
+        identity = svc.connected_channel()
+        print(f"Email:        {identity['email']}")
+        print(f"Channel ID:   {identity['channel_id']}")
+        print(f"Channel name: {identity['channel_title']}")
+        print(f"Channel URL:  {identity['channel_url']}")
     else:
         parser.print_help()
 

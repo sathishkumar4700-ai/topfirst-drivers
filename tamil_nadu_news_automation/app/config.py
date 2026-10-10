@@ -63,6 +63,11 @@ class Settings(BaseSettings):
     youtube_client_secrets_file: Path = SECRETS_DIR / "client_secrets.json"
     youtube_token_file: Path = SECRETS_DIR / "youtube_token.json"
     youtube_api_key: str = ""
+    # Uploads are rejected unless OAuth matches this Google account (when set).
+    youtube_expected_email: str = ""
+    # Optional extra guard: exact channel ID from YouTube Studio → Settings → Advanced.
+    youtube_expected_channel_id: str = ""
+    youtube_playlist_id: str = ""
 
     openai_api_key: str = ""
     openai_model: str = "gpt-4o-mini"

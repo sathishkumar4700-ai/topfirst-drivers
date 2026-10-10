@@ -11,12 +11,14 @@ from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaFileUpload
 
 from app.config import get_settings
+from app.services.youtube_identity import assert_expected_channel
 
 logger = logging.getLogger(__name__)
 
 SCOPES = [
     "https://www.googleapis.com/auth/youtube.upload",
     "https://www.googleapis.com/auth/youtube",
+    "https://www.googleapis.com/auth/userinfo.email",
 ]
 
 
@@ -47,6 +49,12 @@ class YouTubeUploadService:
     def is_configured(self) -> bool:
         return self.settings.youtube_client_secrets_file.exists() or self.settings.youtube_token_file.exists()
 
+    def connected_channel(self) -> dict:
+        creds = self._get_credentials()
+        if creds is None:
+            raise RuntimeError("YouTube OAuth not configured. Run: python -m app.cli youtube-auth")
+        return assert_expected_channel(creds)
+
     def upload(
         self,
         video_path: Path,
@@ -59,7 +67,9 @@ class YouTubeUploadService:
     ) -> dict:
         creds = self._get_credentials()
         if creds is None:
-            raise RuntimeError("YouTube OAuth not configured. Run: tn-news youtube-auth")
+            raise RuntimeError("YouTube OAuth not configured. Run: python -m app.cli youtube-auth")
+        assert_expected_channel(creds)
+        playlist_id = playlist_id or self.settings.youtube_playlist_id or None
         youtube = build("youtube", "v3", credentials=creds)
         body = {
             "snippet": {
