@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Any, Literal
 
 import yaml
-from pydantic import Field, model_validator
+from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from app.operation_phase import apply_phase_defaults
@@ -28,9 +28,22 @@ class Settings(BaseSettings):
     database_url: str = f"sqlite:///{DATA_DIR / 'tn_news.db'}"
     timezone: str = "Asia/Kolkata"
     # 1 = safe pilot (manual runs, RSS-only, no upload). 4 = scheduled daily automation.
-    operation_phase: Literal[1, 4] = 1
-    # None = use phase default (off in phase 1, on in phase 4)
-    scheduler_enabled: bool | None = None
+    operation_phase: int = 1
+
+    @field_validator("operation_phase", mode="before")
+    @classmethod
+    def _coerce_operation_phase(cls, value: object) -> object:
+        if isinstance(value, str) and value.strip().isdigit():
+            return int(value.strip())
+        return value
+
+    @field_validator("operation_phase")
+    @classmethod
+    def _validate_operation_phase(cls, value: int) -> int:
+        if value not in (1, 4):
+            raise ValueError("operation_phase must be 1 or 4")
+        return value
+    scheduler_enabled: bool = True
     publish_mode: Literal["review", "auto"] = "review"
     run_mode: Literal["test", "production"] = "test"
 

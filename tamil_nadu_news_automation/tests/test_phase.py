@@ -17,7 +17,7 @@ def test_phase1_forces_safe_defaults(tmp_path):
     ctx = get_phase_context(s)
     assert ctx.rss_only is True
     assert ctx.youtube_upload_allowed is False
-    assert ctx.scheduler_enabled is False
+    assert ctx.scheduler_enabled is True
 
 
 def test_phase4_enables_scheduler_by_default(tmp_path):

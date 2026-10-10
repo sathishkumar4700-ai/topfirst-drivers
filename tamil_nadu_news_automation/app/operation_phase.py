@@ -28,10 +28,9 @@ class PhaseContext:
 
 def get_phase_context(settings: Settings) -> PhaseContext:
     phase = int(getattr(settings, "operation_phase", 1) or 1)
-    sched_override = settings.scheduler_enabled
+    scheduler = settings.scheduler_enabled
 
     if phase == 1:
-        scheduler = sched_override if sched_override is not None else False
         return PhaseContext(
             phase=1,
             label="Phase 1 — Safe pilot",
@@ -43,14 +42,13 @@ def get_phase_context(settings: Settings) -> PhaseContext:
             skip_youtube_signals=True,
             auto_publish_allowed=False,
             operator_summary=(
-                "Manual or on-demand runs only (scheduler off by default). RSS news only, "
-                "rule-based Tamil scripts, review queue, no YouTube upload. "
-                "Use: python -m app.cli run"
+                "Daily pipeline at configured time when app is running (python -m app.cli serve). "
+                "RSS only, rule-based Tamil scripts, review queue, no YouTube upload. "
+                "Manual run: python -m app.cli run"
             ),
         )
 
     if phase == 4:
-        scheduler = sched_override if sched_override is not None else True
         return PhaseContext(
             phase=4,
             label="Phase 4 — Daily automation",

@@ -15,7 +15,7 @@ OPERATION_PHASE=1
 | Scripts | **Rule-based** Tamil (facts from articles) |
 | Run / upload mode | Forced **`RUN_MODE=test`**, **`PUBLISH_MODE=review`** |
 | YouTube upload | **Blocked** (dashboard + API) |
-| Scheduler | **Off** unless `SCHEDULER_ENABLED=true` |
+| Scheduler | **On** by default (`SCHEDULER_ENABLED=true`); requires `python -m app.cli serve` or Docker |
 
 **Daily workflow**
 
@@ -25,7 +25,11 @@ python -m app.cli run
 
 Review videos under `data/output/` and in the dashboard. Tune `MIN_STORY_CONFIDENCE` and `config/settings.yaml` feeds.
 
-Optional: `python -m app.cli serve` for the dashboard without starting the scheduler.
+Start the server to activate the scheduler:
+
+```bash
+python -m app.cli serve
+```
 
 ---
 

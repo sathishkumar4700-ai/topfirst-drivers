@@ -4,7 +4,7 @@ Production-oriented Python automation that discovers Tamil Nadu news, ranks and 
 
 ## Operation phases
 
-- **Phase 1 (default):** RSS-only discovery, rule-based scripts, review queue, **no YouTube upload**, **no scheduler** — run manually each day.
+- **Phase 1 (default):** RSS-only discovery, rule-based scripts, review queue, **no YouTube upload**; **scheduler on by default** when you run `python -m app.cli serve`.
 - **Phase 4:** Daily scheduler, optional paid signals, notifications, auto-publish when configured.
 
 Full guide: [docs/PHASES.md](docs/PHASES.md). Production template: `.env.phase4.example`.

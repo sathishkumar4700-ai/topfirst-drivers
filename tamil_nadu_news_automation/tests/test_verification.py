@@ -3,6 +3,7 @@ from app.services.verification import VerificationService
 
 
 def test_verification_requires_sources_in_production(monkeypatch):
+    monkeypatch.setenv("OPERATION_PHASE", "4")
     monkeypatch.setenv("RUN_MODE", "production")
     from app.config import get_settings
 
