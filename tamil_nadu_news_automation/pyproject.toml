@@ -1,0 +1,54 @@
+[project]
+name = "tamil-nadu-news-automation"
+version = "1.0.0"
+description = "Daily Tamil Nadu trending news AI video automation for YouTube"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "sqlalchemy>=2.0.36",
+    "alembic>=1.14.0",
+    "psycopg2-binary>=2.9.10",
+    "pydantic>=2.10.0",
+    "pydantic-settings>=2.6.0",
+    "apscheduler>=3.10.4",
+    "httpx>=0.28.0",
+    "feedparser>=6.0.11",
+    "python-multipart>=0.0.17",
+    "jinja2>=3.1.4",
+    "itsdangerous>=2.2.0",
+    "passlib[bcrypt]>=1.7.4",
+    "google-api-python-client>=2.154.0",
+    "google-auth-oauthlib>=1.2.1",
+    "google-auth-httplib2>=0.2.0",
+    "edge-tts>=6.1.12",
+    "Pillow>=11.0.0",
+    "pyyaml>=6.0.2",
+    "python-dotenv>=1.0.1",
+    "pytz>=2024.2",
+]
+
+[project.optional-dependencies]
+trends = ["pytrends>=4.9.2"]
+llm = ["openai>=1.57.0"]
+dev = [
+    "pytest>=8.3.0",
+    "pytest-asyncio>=0.24.0",
+    "httpx>=0.28.0",
+]
+
+[project.scripts]
+tn-news = "app.cli:main"
+
+[build-system]
+requires = ["setuptools>=75.0.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

@@ -1,0 +1,11 @@
+.env
+data/tn_news.db
+data/secrets/
+data/output/
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+*.egg-info/
+dist/
+build/

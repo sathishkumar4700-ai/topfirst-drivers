@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>TN News Automation Dashboard</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 2rem; background: #0f172a; color: #e2e8f0; }
+    h1 { color: #38bdf8; }
+    table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+    th, td { border: 1px solid #334155; padding: 0.5rem; text-align: left; }
+    th { background: #1e293b; }
+    .btn { background: #2563eb; color: white; border: none; padding: 0.5rem 1rem; margin-right: 0.5rem; cursor: pointer; border-radius: 6px; }
+    .danger { background: #dc2626; }
+    .ok { color: #4ade80; }
+    .warn { color: #fbbf24; }
+    pre { background: #1e293b; padding: 1rem; overflow: auto; max-height: 200px; }
+  </style>
+</head>
+<body>
+  <h1>Tamil Nadu Daily News Automation</h1>
+  <p class="warn"><strong>{{ phase.label }}</strong> — {{ phase.operator_summary }}</p>
+  <p>Paused: <strong>{{ control.paused }}</strong> | Emergency stop: <strong>{{ control.emergency_stop }}</strong></p>
+  <button class="btn" onclick="post('/api/run-now')">Run pipeline now</button>
+  <button class="btn" onclick="post('/api/control/resume')">Resume</button>
+  <button class="btn" onclick="post('/api/control/pause')">Pause</button>
+  <button class="btn danger" onclick="post('/api/control/emergency-stop')">Emergency stop</button>
+
+  <h2>Today's run</h2>
+  {% if today_run %}
+  <p>Status: {{ today_run.status.value }} | Date: {{ today_run.run_date }}</p>
+  {% else %}
+  <p>No runs yet.</p>
+  {% endif %}
+
+  <h2>Story candidates</h2>
+  <table>
+    <tr><th>Headline</th><th>Score</th><th>Confidence</th><th>Selected</th><th>Sources</th></tr>
+    {% for c in candidates %}
+    <tr>
+      <td>{{ c.headline[:80] }}</td>
+      <td>{{ '%.2f'|format(c.final_score) }}</td>
+      <td>{{ '%.2f'|format(c.confidence) }}</td>
+      <td>{% if c.selected %}<span class="ok">yes</span>{% else %}no{% endif %}</td>
+      <td>{{ c.source_urls|length }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <h2>Video productions</h2>
+  <table>
+    <tr><th>ID</th><th>Status</th><th>Title</th><th>Cost</th><th>QA</th><th>Actions</th></tr>
+    {% for p in productions %}
+    <tr>
+      <td>{{ p.id }}</td>
+      <td>{{ p.status.value }}</td>
+      <td>{{ (p.title_ta or '')[:60] }}</td>
+      <td>${{ '%.2f'|format(p.estimated_cost_usd) }}</td>
+      <td>{% if p.qa_results_json and p.qa_results_json.passed %}<span class="ok">pass</span>{% else %}<span class="warn">check</span>{% endif %}</td>
+      <td>
+        {% if p.status.value == 'pending_approval' %}
+        <button class="btn" onclick="post('/api/videos/{{ p.id }}/approve')">Approve</button>
+        {% endif %}
+        {% if phase.youtube_upload_allowed and p.status.value in ['approved', 'pending_approval'] %}
+        <button class="btn" onclick="post('/api/videos/{{ p.id }}/upload')">Upload YouTube</button>
+        {% elif not phase.youtube_upload_allowed and p.status.value in ['approved', 'pending_approval'] %}
+        <span class="warn">Upload locked (Phase 1)</span>
+        {% endif %}
+        {% if p.youtube_url %}<a href="{{ p.youtube_url }}" target="_blank">View</a>{% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <h2>Run history</h2>
+  <table>
+    <tr><th>ID</th><th>Date</th><th>Status</th><th>Errors</th></tr>
+    {% for r in runs %}
+    <tr>
+      <td>{{ r.id }}</td>
+      <td>{{ r.run_date }}</td>
+      <td>{{ r.status.value }}</td>
+      <td><pre>{{ r.error_log or '' }}</pre></td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <script>
+    async function post(url) {
+      const r = await fetch(url, { method: 'POST', credentials: 'include' });
+      alert(JSON.stringify(await r.json()));
+      location.reload();
+    }
+  </script>
+</body>
+</html>
