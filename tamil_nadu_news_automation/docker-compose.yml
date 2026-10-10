@@ -1,0 +1,29 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: tnnews
+      POSTGRES_PASSWORD: tnnews
+      POSTGRES_DB: tn_news
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  app:
+    build: .
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://tnnews:tnnews@postgres:5432/tn_news
+    volumes:
+      - ./data:/app/data
+      - ./assets:/app/assets
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+volumes:
+  pgdata:

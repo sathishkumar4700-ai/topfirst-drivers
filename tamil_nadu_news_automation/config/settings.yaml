@@ -1,0 +1,78 @@
+timezone: Asia/Kolkata
+
+schedule:
+  collect_news: "05:00"
+  rank_stories: "05:15"
+  generate_scripts: "05:30"
+  generate_media: "05:45"
+  render_videos: "06:30"
+  quality_check: "07:00"
+  publish: "07:15"
+
+scoring_weights:
+  recency: 0.25
+  trend_momentum: 0.25
+  tn_importance: 0.25
+  corroboration: 0.15
+  audience_relevance: 0.10
+
+penalties:
+  duplicate: 0.35
+  stale_hours: 72
+  stale_penalty: 0.25
+  single_source: 0.15
+  clickbait_keywords: 0.20
+
+categories:
+  - state_politics
+  - chennai_districts
+  - crime_safety
+  - business_economy
+  - education_jobs
+  - technology_science
+  - cinema_kollywood
+  - sports
+  - weather_disasters
+  - transport_infrastructure
+  - public_viral
+  - health_agri_env
+
+video:
+  width: 1920
+  height: 1080
+  fps: 30
+  min_duration_sec: 120
+  max_duration_sec: 240
+  subtitle_languages: [ta, en]
+
+rss_feeds:
+  - name: The Hindu Tamil Nadu
+    url: https://www.thehindu.com/news/national/tamil-nadu/feeder/default.rss
+    language: en
+    credibility: 0.9
+  - name: Times of India Chennai
+    url: https://timesofindia.indiatimes.com/rssfeeds/2950623.cms
+    language: en
+    credibility: 0.85
+  - name: Indian Express Tamil Nadu
+    url: https://indianexpress.com/section/cities/chennai/feed/
+    language: en
+    credibility: 0.82
+  - name: Google News Tamil Nadu (EN)
+    url: https://news.google.com/rss/search?q=Tamil+Nadu+when:2d&hl=en-IN&gl=IN&ceid=IN:en
+    language: en
+    credibility: 0.75
+
+google_trends:
+  geo: IN-TN
+  timeframe: now 1-d
+  keywords_seed:
+    - Tamil Nadu news
+    - Chennai news
+    - Tamil Nadu government
+
+youtube_signals:
+  region_code: IN
+  relevance_language: ta
+  max_results: 25
+  published_within_hours: 48
