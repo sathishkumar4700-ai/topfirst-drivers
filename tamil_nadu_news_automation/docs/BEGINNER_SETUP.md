@@ -218,31 +218,39 @@ After it finishes, check YouTube Studio (studio.youtube.com) — new videos may 
 
 ---
 
-# PART 3 — Run every morning automatically
+# PART 3 — When you turn the laptop on (no fixed clock time)
 
-**Goal:** At **7:15 AM India time**, the computer/server runs the job and uploads (if Part 2 is done).
+**Goal:** Each day you **open the laptop**, start the app once → it makes videos and uploads to YouTube (if Part 2 is done).  
+You do **not** need the laptop on at 7:15 AM.
 
-The computer must stay **on** (or use a cloud server).
+In `.env` use:
 
-### Step 1 — Start the background service
+```env
+RUN_TRIGGER=on_startup
+SCHEDULER_ENABLED=false
+```
 
-In the project folder (venv activated):
+### Step 1 — Morning routine
+
+1. Turn on laptop, connect to internet.
+2. Open Terminal in the project folder (venv activated):
 
 ```bash
 python -m app.cli serve
 ```
 
-Leave this window open. Open browser: http://localhost:8080  
-Login: username `admin`, password = what you set in `.env` as `DASHBOARD_PASSWORD`.
+3. **Leave the window open** while it works (often 15–30+ minutes). It runs automatically in the background.
+4. Check YouTube Studio when finished.
 
-### Step 2 — Keep it running 24/7 (options)
+If you already ran successfully **today**, starting `serve` again will **not** duplicate videos (once per day).
 
-- **Simple:** Leave an old PC on with `serve` running.
-- **Better:** Rent a small VPS (DigitalOcean, AWS, etc.) and use **Docker** — ask a technical friend or hire help for one hour to run `docker compose up -d` from the project README.
+### Step 2 — Pause if needed
 
-### Step 3 — Pause if needed
+Dashboard http://localhost:8080 → **Pause** or **Emergency stop**.
 
-Open dashboard → **Pause** or **Emergency stop** if you go on holiday.
+### Optional: fixed time every day instead
+
+Set `RUN_TRIGGER=schedule` and `SCHEDULER_ENABLED=true` (laptop must be on before that time).
 
 ---
 

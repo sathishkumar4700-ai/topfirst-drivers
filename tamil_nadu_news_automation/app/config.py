@@ -44,6 +44,10 @@ class Settings(BaseSettings):
             raise ValueError("operation_phase must be 1 or 4")
         return value
     scheduler_enabled: bool = True
+    # schedule = fixed clock time (APScheduler). on_startup = when you start the app (laptop on).
+    run_trigger: Literal["schedule", "on_startup"] = "on_startup"
+    skip_if_ran_today: bool = True
+    force_daily_run: bool = False
     publish_mode: Literal["review", "auto"] = "review"
     run_mode: Literal["test", "production"] = "test"
 

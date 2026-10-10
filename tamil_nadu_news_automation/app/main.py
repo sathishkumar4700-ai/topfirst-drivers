@@ -9,6 +9,7 @@ from app.config import get_settings
 from app.db.session import init_db
 from app.operation_phase import get_phase_context, validate_phase4_readiness
 from app.services.scheduler import start_scheduler
+from app.services.startup_run import trigger_startup_pipeline_async
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 
@@ -26,7 +27,13 @@ def on_startup() -> None:
     if ctx.phase == 4:
         for w in validate_phase4_readiness(settings):
             logger.warning(w)
-    start_scheduler()
+    if settings.run_trigger == "on_startup":
+        logger.info("RUN_TRIGGER=on_startup — pipeline runs when app starts (once per day)")
+        trigger_startup_pipeline_async()
+    elif ctx.scheduler_enabled:
+        start_scheduler()
+    else:
+        logger.info("No scheduler; use dashboard Run now or: python -m app.cli run")
 
 
 @app.get("/health")
@@ -37,6 +44,7 @@ def health():
         "status": "ok",
         "operation_phase": ctx.phase,
         "scheduler_enabled": ctx.scheduler_enabled,
+        "run_trigger": settings.run_trigger,
         "publish_mode": settings.publish_mode,
         "run_mode": settings.run_mode,
     }
