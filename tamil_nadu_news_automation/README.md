@@ -11,6 +11,8 @@ Full guide: [docs/PHASES.md](docs/PHASES.md). Production template: `.env.phase4.
 
 **New to this?** Follow [docs/BEGINNER_SETUP.md](docs/BEGINNER_SETUP.md) (plain language, step by step).
 
+**Auto-run when laptop turns on:** [docs/AUTO_START_LAPTOP.md](docs/AUTO_START_LAPTOP.md) (one-time Windows/Mac install).
+
 ## Quick start (Phase 1 pilot)
 
 ```bash

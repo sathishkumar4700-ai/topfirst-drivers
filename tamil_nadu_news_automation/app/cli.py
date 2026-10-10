@@ -18,7 +18,11 @@ def main() -> None:
     sub.add_parser("init-db", help="Create database tables")
     run_p = sub.add_parser("run", help="Run daily pipeline once")
     run_p.add_argument("--stage", default="full", choices=["full", "collect"])
-    sub.add_parser("serve", help="Start API server with scheduler")
+    sub.add_parser("serve", help="Start API server (optional background run)")
+    sub.add_parser(
+        "boot",
+        help="Run today's pipeline once (for laptop login auto-start; skips if already done today)",
+    )
     sub.add_parser("youtube-auth", help="Authorize YouTube OAuth (requires client secrets)")
     sub.add_parser("youtube-whoami", help="Show OAuth email and YouTube channel (verifies expected account)")
 
@@ -39,6 +43,11 @@ def main() -> None:
         import uvicorn
 
         uvicorn.run("app.main:app", host="0.0.0.0", port=8080, reload=False)
+    elif args.command == "boot":
+        from app.services.startup_run import run_startup_pipeline_blocking
+        import sys
+
+        sys.exit(run_startup_pipeline_blocking())
     elif args.command == "youtube-auth":
         from app.services.youtube import YouTubeUploadService
 

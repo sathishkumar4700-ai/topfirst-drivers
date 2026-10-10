@@ -50,7 +50,8 @@ def should_run_today(db: Session) -> tuple[bool, str]:
     return True, "Continuing today's pipeline"
 
 
-def _run_in_background() -> None:
+def run_startup_pipeline_blocking() -> int:
+    """Run pipeline once (for login / boot scripts). Returns exit code 0=ok/skipped, 1=error."""
     init_db()
     Session = sessionmaker(bind=get_engine())
     db = Session()
@@ -58,20 +59,24 @@ def _run_in_background() -> None:
         allowed, reason = is_pipeline_allowed(db)
         if not allowed:
             logger.info("Startup pipeline skipped: %s", reason)
-            return
-
+            return 0
         ok, why = should_run_today(db)
         if not ok:
             logger.info("Startup pipeline skipped: %s", why)
-            return
-
+            return 0
         logger.info("Startup pipeline starting: %s", why)
-        DailyPipeline(db).run()
-        logger.info("Startup pipeline finished")
+        run = DailyPipeline(db).run()
+        logger.info("Startup pipeline finished: %s", run.status.value)
+        return 0 if run.status in (RunStatus.completed, RunStatus.partial) else 1
     except Exception:
         logger.exception("Startup pipeline failed")
+        return 1
     finally:
         db.close()
+
+
+def _run_in_background() -> None:
+    run_startup_pipeline_blocking()
 
 
 def trigger_startup_pipeline_async() -> None:

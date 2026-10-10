@@ -41,8 +41,10 @@ video:
   width: 1920
   height: 1080
   fps: 30
-  min_duration_sec: 120
-  max_duration_sec: 240
+  min_duration_sec: 30
+  max_duration_sec: 180
+  max_speech_chars: 1400
+  pad_to_min_duration: false
   subtitle_languages: [ta, en]
 
 rss_feeds:

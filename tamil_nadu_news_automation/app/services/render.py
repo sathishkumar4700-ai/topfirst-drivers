@@ -10,6 +10,7 @@ from app.config import OUTPUT_DIR, get_settings
 from app.providers.tts.factory import synthesize_speech
 from app.schemas.news import TamilScript, VerifiedStory
 from app.services.subtitles import write_simple_srt
+from app.services.catchy_metadata import trim_script_for_max_duration
 from app.services.thumbnail import generate_thumbnail
 
 logger = logging.getLogger(__name__)
@@ -68,12 +69,24 @@ class VideoRenderService:
     ) -> dict:
         base = OUTPUT_DIR / f"run_{run_id}" / f"story_{story_id}"
         base.mkdir(parents=True, exist_ok=True)
+        max_chars = int(self.video_cfg.get("max_speech_chars", 1400))
+        narration_text = trim_script_for_max_duration(script.tamil_script, max_chars)
         audio_path = base / "narration.mp3"
-        synthesize_speech(script.tamil_script, audio_path)
+        synthesize_speech(narration_text, audio_path)
         duration = _ffprobe_duration(audio_path)
-        min_d = float(self.video_cfg.get("min_duration_sec", 120))
-        max_d = float(self.video_cfg.get("max_duration_sec", 240))
-        if duration < min_d:
+        max_d = float(self.video_cfg.get("max_duration_sec", 180))
+        min_d = float(self.video_cfg.get("min_duration_sec", 30))
+        pad_to_min = bool(self.video_cfg.get("pad_to_min_duration", False))
+        if duration > max_d:
+            trimmed = base / "narration_trimmed.mp3"
+            subprocess.run(
+                ["ffmpeg", "-y", "-i", str(audio_path), "-t", str(max_d), "-c", "copy", str(trimmed)],
+                check=True,
+                capture_output=True,
+            )
+            audio_path = trimmed
+            duration = max_d
+        elif pad_to_min and duration < min_d:
             pad = base / "silence.mp3"
             subprocess.run(
                 [
@@ -108,7 +121,6 @@ class VideoRenderService:
             )
             audio_path = merged
             duration = _ffprobe_duration(audio_path)
-        duration = min(duration, max_d)
 
         slide = base / "slide.png"
         _create_slide_image(story.headline, slide, self.w, self.h)
@@ -178,7 +190,12 @@ class VideoRenderService:
             )
             video_out = mixed
 
-        thumb = generate_thumbnail(script.title_ta, base / "thumbnail.jpg", story.category)
+        thumb = generate_thumbnail(
+            script.title_ta,
+            base / "thumbnail.jpg",
+            story.category,
+            story=story,
+        )
         cost = 0.02 if self.settings.tts_provider == "edge" else 0.15
         return {
             "video_path": str(video_out),
