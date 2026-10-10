@@ -9,6 +9,8 @@ from sqlalchemy import select
 from starlette.requests import Request
 
 from app.api.deps import get_database, verify_dashboard
+from app.config import get_settings
+from app.operation_phase import get_phase_context
 from app.models.entities import DailyRun, StoryCandidate, SystemControl, VideoProduction, VideoStatus
 from app.services.pipeline import DailyPipeline
 from app.services.system_control import get_control
@@ -32,6 +34,7 @@ def dashboard(request: Request, db=Depends(get_database), _user: str = Depends(v
             select(VideoProduction).where(VideoProduction.daily_run_id == today_run.id)
         ).all()
     ctrl = get_control(db)
+    phase = get_phase_context(get_settings())
     return templates.TemplateResponse(
         "dashboard.html",
         {
@@ -41,6 +44,7 @@ def dashboard(request: Request, db=Depends(get_database), _user: str = Depends(v
             "candidates": candidates,
             "productions": productions,
             "control": ctrl,
+            "phase": phase,
         },
     )
 
@@ -92,6 +96,12 @@ def upload_video(production_id: int, db=Depends(get_database), _user: str = Depe
         raise HTTPException(404, "Not found")
     if prod.status not in (VideoStatus.approved, VideoStatus.pending_approval):
         raise HTTPException(400, "Video not approved for upload")
+    phase = get_phase_context(get_settings())
+    if not phase.youtube_upload_allowed:
+        raise HTTPException(
+            403,
+            "YouTube upload is disabled in Phase 1. Set OPERATION_PHASE=4 when ready to publish.",
+        )
     svc = YouTubeUploadService()
     result = svc.upload(
         Path(prod.video_path),

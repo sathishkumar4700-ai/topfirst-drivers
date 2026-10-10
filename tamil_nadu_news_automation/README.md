@@ -2,7 +2,14 @@
 
 Production-oriented Python automation that discovers Tamil Nadu news, ranks and verifies stories, generates original Tamil AI news videos, and publishes to YouTube with safeguards, logging, and an admin dashboard.
 
-## Quick start (local test mode)
+## Operation phases
+
+- **Phase 1 (default):** RSS-only discovery, rule-based scripts, review queue, **no YouTube upload**, **no scheduler** — run manually each day.
+- **Phase 4:** Daily scheduler, optional paid signals, notifications, auto-publish when configured.
+
+Full guide: [docs/PHASES.md](docs/PHASES.md). Production template: `.env.phase4.example`.
+
+## Quick start (Phase 1 pilot)
 
 ```bash
 cd tamil_nadu_news_automation
@@ -11,6 +18,7 @@ source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 pip install -e .
 cp .env.example .env
+# OPERATION_PHASE=1 is already the default
 python -m app.cli init-db
 python -m app.cli run
 ```
@@ -26,6 +34,7 @@ python -m app.cli serve
 
 | Setting | Values | Meaning |
 |---------|--------|---------|
+| `OPERATION_PHASE` | `1` / `4` | Pilot vs daily automation profile |
 | `RUN_MODE` | `test` / `production` | Test relaxes verification; uploads default to private when test |
 | `PUBLISH_MODE` | `review` / `auto` | Review waits for dashboard approval before upload |
 

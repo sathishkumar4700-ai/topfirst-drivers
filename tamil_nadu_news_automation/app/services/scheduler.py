@@ -8,6 +8,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 
 from app.config import get_settings
+from app.operation_phase import get_phase_context, validate_phase4_readiness
 from app.db.session import get_engine, init_db
 from app.services.pipeline import DailyPipeline
 from sqlalchemy.orm import sessionmaker
@@ -32,11 +33,20 @@ def _run_pipeline(stage: str = "full") -> None:
         db.close()
 
 
-def start_scheduler() -> BackgroundScheduler:
+def start_scheduler() -> BackgroundScheduler | None:
     global _scheduler
     if _scheduler is not None:
         return _scheduler
     settings = get_settings()
+    phase = get_phase_context(settings)
+    if not phase.scheduler_enabled:
+        logger.info(
+            "Scheduler disabled (Phase %d). Run pipeline manually: python -m app.cli run",
+            phase.phase,
+        )
+        return None
+    for warning in validate_phase4_readiness(settings):
+        logger.warning("Phase 4 readiness: %s", warning)
     yaml_cfg = settings.load_yaml()
     schedule = yaml_cfg.get("schedule", {})
     tz = pytz.timezone(settings.timezone)

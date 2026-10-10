@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 from app.config import get_settings
 from app.models.entities import DailyRun, RunStatus, StoryCandidate, VideoProduction, VideoStatus
 from app.services.cost_control import BudgetExceeded, CostControlService
+from app.operation_phase import get_phase_context
 from app.services.discovery import DiscoveryService
 from app.services.notifications import NotificationService
 from app.services.qa import QualityAssuranceService
@@ -163,7 +164,8 @@ class DailyPipeline:
                 productions.append(prod)
 
             uploaded_links: list[str] = []
-            if self.settings.publish_mode == "auto":
+            phase = get_phase_context(self.settings)
+            if self.settings.publish_mode == "auto" and phase.auto_publish_allowed:
                 for prod in productions:
                     if prod.status != VideoStatus.approved:
                         continue

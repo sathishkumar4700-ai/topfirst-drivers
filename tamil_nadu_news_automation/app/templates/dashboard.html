@@ -18,6 +18,7 @@
 </head>
 <body>
   <h1>Tamil Nadu Daily News Automation</h1>
+  <p class="warn"><strong>{{ phase.label }}</strong> — {{ phase.operator_summary }}</p>
   <p>Paused: <strong>{{ control.paused }}</strong> | Emergency stop: <strong>{{ control.emergency_stop }}</strong></p>
   <button class="btn" onclick="post('/api/run-now')">Run pipeline now</button>
   <button class="btn" onclick="post('/api/control/resume')">Resume</button>
@@ -59,8 +60,10 @@
         {% if p.status.value == 'pending_approval' %}
         <button class="btn" onclick="post('/api/videos/{{ p.id }}/approve')">Approve</button>
         {% endif %}
-        {% if p.status.value in ['approved', 'pending_approval'] %}
+        {% if phase.youtube_upload_allowed and p.status.value in ['approved', 'pending_approval'] %}
         <button class="btn" onclick="post('/api/videos/{{ p.id }}/upload')">Upload YouTube</button>
+        {% elif not phase.youtube_upload_allowed and p.status.value in ['approved', 'pending_approval'] %}
+        <span class="warn">Upload locked (Phase 1)</span>
         {% endif %}
         {% if p.youtube_url %}<a href="{{ p.youtube_url }}" target="_blank">View</a>{% endif %}
       </td>

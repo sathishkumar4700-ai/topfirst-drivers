@@ -6,8 +6,10 @@ from pathlib import Path
 from typing import Any, Literal
 
 import yaml
-from pydantic import Field
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from app.operation_phase import apply_phase_defaults
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT_DIR / "data"
@@ -25,6 +27,10 @@ class Settings(BaseSettings):
     app_env: str = "development"
     database_url: str = f"sqlite:///{DATA_DIR / 'tn_news.db'}"
     timezone: str = "Asia/Kolkata"
+    # 1 = safe pilot (manual runs, RSS-only, no upload). 4 = scheduled daily automation.
+    operation_phase: Literal[1, 4] = 1
+    # None = use phase default (off in phase 1, on in phase 4)
+    scheduler_enabled: bool | None = None
     publish_mode: Literal["review", "auto"] = "review"
     run_mode: Literal["test", "production"] = "test"
 
@@ -73,6 +79,10 @@ class Settings(BaseSettings):
     background_music_path: Path = ROOT_DIR / "assets" / "audio" / "background.mp3"
 
     yaml_config_path: Path = ROOT_DIR / "config" / "settings.yaml"
+
+    @model_validator(mode="after")
+    def _phase_defaults(self) -> "Settings":
+        return apply_phase_defaults(self)
 
     @property
     def is_sqlite(self) -> bool:
